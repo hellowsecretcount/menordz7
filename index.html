@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adivina la canción</title>
+
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    padding:40px;
+}
+
+button{
+    padding:12px 24px;
+    font-size:18px;
+    cursor:pointer;
+    margin:5px;
+}
+
+input{
+    width:80%;
+    max-width:500px;
+    padding:10px;
+    font-size:16px;
+    margin-top:15px;
+}
+
+#status{
+    margin-top:20px;
+    color:#ccc;
+}
+
+#result{
+    margin-top:20px;
+    font-size:20px;
+}
+
+#score{
+    margin-top:15px;
+    font-size:22px;
+}
+</style>
+</head>
+<body>
+
+<h1>🎵 Adivina la canción</h1>
+
+<div id="score">
+Aciertos: 0 | Fallos: 0
+</div>
+
+<br>
+
+<button onclick="playRandomClip()">
+Escuchar 6 segundos
+</button>
+
+<br>
+
+<input
+    id="guess"
+    type="text"
+    placeholder="Escribe el nombre de la canción">
+
+<br>
+
+<button onclick="checkAnswer()">
+Comprobar
+</button>
+
+<button onclick="playRandomClip()">
+Siguiente
+</button>
+
+<div id="result"></div>
+<div id="status"></div>
+<div id="player"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+const videos = [
+  {
+    "id": "BEbSlFHIYBs",
+    "title": "CYGNUS QUAGHOST 🎠🗡MC Gw - Dj Menor Da Dz7"
+  },
+  {
+    "id": "ZeXZ9V-zi74",
+    "title": "ASTROALPHA VECTORIAN🈳🎬- Dj Menor Da Dz7"
+  },
+  {
+    "id": "a4icSCmsd_0",
+    "title": "STARDARK CYBERPLASMA ⏳🔬 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "mNYGaohoI-A",
+    "title": "ASTRONYSNS 👾☠️ - Dj Menor Da Dz7"
+  },
+  {
+    "id": "XoDc6ScnUIg",
+    "title": "INFINITY XISLY🌌🌍 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Aw2cmWQ2gZg",
+    "title": "多元宇宙星界次元界虚空界 🎷 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "cI1Mq86Tcdo",
+    "title": "MARCOLÂNDIA ORQUESTRAL 🧌 MC PRR FELIPINHO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "BjIGpBjDnsU",
+    "title": "MARCOLÂNDIA MAROLADISSIMA 🧞‍♂️🧌"
+  },
+  {
+    "id": "OGSmk6riVmc",
+    "title": "BEM VINDO A MARCOLÂNDIA 💿"
+  },
+  {
+    "id": "wnzg9ls59HI",
+    "title": "MONTAGEM ANGTIKAL 🏹🌪️ - Dj Menor Da Dz7 & DJ XAVIER ZS"
+  },
+  {
+    "id": "4c2wgeHFud0",
+    "title": "MONTAGEM FICLEAKEY 🦅🛰️  - DJ Xavier Zs & Dj Menor Da Dz7"
+  },
+  {
+    "id": "-nttmRcVEDM",
+    "title": "ZN ARQUETDOXISMO 🤺🦅 MC FAHAH, MC Gw - Dj Menor Da Dz7"
+  },
+  {
+    "id": "3U_tCGh1xQk",
+    "title": "MONTAGEM INTÍCLGREGA 🌌 🤺 MC RF 33. MC QsJ - Dj Menor Da Dz7"
+  },
+  {
+    "id": "8mrpdSNPw28",
+    "title": "MONTAGEM TESLYCAMY 🚀👽 Iraque Zl - Dj Menor Da Dz7"
+  },
+  {
+    "id": "P8UBf97g3Vk",
+    "title": "MONTAGEM  MYÍTICASTRAL 💎🎶 MC BRISOLA - Dj Menor Da Dz7"
+  },
+  {
+    "id": "mjpEBmpBWmc",
+    "title": "MONTAGEM EYLÍCTAN 🤺🛠 WR ORIGINAL - Dj Menor Da Dz7"
+  },
+  {
+    "id": "P0dxvdLTfd0",
+    "title": "TOMA 24 HORAS 🤯🕺🏻 -  Dj Menor Da Dz7"
+  },
+  {
+    "id": "OQM7Egt3JjM",
+    "title": "MONTAGEM SYLITPADÍCA 🐱‍👤🌍 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "LEjtwCo2UEg",
+    "title": "ZN WSYLÍCTA 🎈 MC DELUX - DJ Menor Da Dz7 & DJ MARTINELLI"
+  },
+  {
+    "id": "xIXZi3Au9bw",
+    "title": "BERIMBAU DO TEXAS 💥™ MC GW - Dj Menor Da Dz7 & DJ MARTINELLI"
+  },
+  {
+    "id": "ycMaH-4txjw",
+    "title": "MONTAGEM LIRYC OURT 🪼🍃 - Dj Menor Da Dz7 & DJ JEAN 011"
+  },
+  {
+    "id": "lPcint180KY",
+    "title": "MONTAGEM SPRING FIELD ☸🧬 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "CAolWWRyqvA",
+    "title": "ZN MERCENÁRIA🤺🈳 MC Gw - Dj Menor Da Dz7"
+  },
+  {
+    "id": "3VPUrg6RL3E",
+    "title": "MONTAGEM YSCLÍFIT 🎱🎩 MC MND 011 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "IItNFNf3emM",
+    "title": "BERIMBAU CAPATAZ 🈵🪒 MC POGBA & MC 7BELO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "gKG-NGcfazY",
+    "title": "ZN CYLATÍVAL 🚂🚀 MC MR BIM - Dj Menor Da Dz7"
+  },
+  {
+    "id": "W0TCAMvGODs",
+    "title": "ZONA NORTE BERIMBALÍSTICA 🎶♨️ MC BRUNIN JP - Dj Menor Da Dz7"
+  },
+  {
+    "id": "-peMzOpRyyA",
+    "title": "MONTAGEM MÍSLYCLAM 🚂 MC PR - Dj Menor Da Dz7"
+  },
+  {
+    "id": "EcgKgpxrWCE",
+    "title": "BERIMBAU ITYCO 🌌  - Dj Menor Da Dz7"
+  },
+  {
+    "id": "zkmWJwBMBMY",
+    "title": "MONTAGEM LANCYCLAYT 👽 MC Gw - DJ MENOR DA DZ7 & DJ XAVIER ZS"
+  },
+  {
+    "id": "SCI2Idq-JyU",
+    "title": "MONTAGEM CRYSTIAL 🔮💎 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "M9-xve3RRl8",
+    "title": "MONTAGEM LIXSVST 🪽🤺 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "_8ymLeKKjcU",
+    "title": "MONTAGEM INSUITY LIST 🐦‍🔥🏆 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "CGGZrRtszb0",
+    "title": "ZN LEÍROLYNT 🎯🛸 MC Gw - Dj Menor Da Dz7"
+  },
+  {
+    "id": "RCNmTYiLmvw",
+    "title": "AUTOMOTIVO NICLÍTICO ☄️🏹 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "4nPNG8GJ07I",
+    "title": "BERIMBAU YOSTYALÍCO 🪽🌪️ - Dj Menor Da Dz7"
+  },
+  {
+    "id": "tyNk2yxIPGM",
+    "title": "SET FINAL DE ANO \" AUTOMOTIVO \" ✨💫"
+  },
+  {
+    "id": "ltAk-jAcfAs",
+    "title": "SET FINAL DE ANO 🍀"
+  },
+  {
+    "id": "t5QUUsJBTpM",
+    "title": "ZN ORDONTAUNY 🦖⚓ MC PRR FELIPINHO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "ts29BMpMT20",
+    "title": "MONTAGEM YURCLÔNICA 🥷🏽🦅 - Dj Menor da Dz7"
+  },
+  {
+    "id": "oZgqJLh-vl4",
+    "title": "ZN TRALYTIS 🧙🏽‍♂️🎶 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "LVHPyZjuhB4",
+    "title": "AUTOMOTIVO TRÍCADST 🏌🏽‍♂️📡 MC YURI REDICOPA, MC MANDRAKE 100% ORIGINAL - Dj Menor Da Dz7"
+  },
+  {
+    "id": "RGM1wfqHvTc",
+    "title": "MONTAGEM CLEYLACT 🦑🪽 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "PzNYKu4XdOQ",
+    "title": "MONTAGEM CÍRCLATIVA 🎬💡 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "JUlfXF000Fk",
+    "title": "MANDELÃO XXV 🧛🏽‍♂️🐲 - Dj Menor Da Dz7 & DJ HENRIQUE DE SÃO MATHEUS"
+  },
+  {
+    "id": "0ZfDZ8ST7Tg",
+    "title": "ZN YAQUEKINAL 🧞‍♂️🪐MC PRR FELIPINHO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "HoZeP1wjQs8",
+    "title": "MONTAGEM ANYLATRAÇÃO 🎯 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "8T_DP_dmfRg",
+    "title": "MONTAGEM FISÍOLTRICA 🎰🪓 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "8-1kKJKWrFI",
+    "title": "BERIMBAU CALYPTCO ✨🏎️ -  Dj Menor Da Dz7"
+  },
+  {
+    "id": "iyLcSRMHaUs",
+    "title": "MONTAGEM REGORÍCA ⚜️🔱 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "9w22BhsZygY",
+    "title": "MONTAGEM ÓGALYCA 🧞‍♂️🧌  - Dj Menor Da Dz7"
+  },
+  {
+    "id": "lwXPIVf14lA",
+    "title": "ZN BLIMINAR 🌐🛰 MC DENNY - Dj Menor da Dz7"
+  },
+  {
+    "id": "4kVVFh8NiSE",
+    "title": "MONTAGEM LETRICK 🍄🐚 MC NITO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "6EpXsp-yI5A",
+    "title": "ZN YALIMITÍC 🧊🔪 MC K3 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "OBzXc1bAxjU",
+    "title": "ZN ARYGAMY 🍀♟ MC K3 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "NRBP-27-0hQ",
+    "title": "ZN AKIMONETRO 🈚️🏺 MC NEGRITIN MC QSJ - Dj Menor Da Dz7"
+  },
+  {
+    "id": "OHWATBPPlnc",
+    "title": "BERIMBALÍSTICO LIPTÍCYS 🤺🕷 MC BM OFICIAL - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "fS9961TVCLU",
+    "title": "MONTAGEM BERIMBAU EMBLEMÁTICO 📿🏹 MC Gw - Dj Menor Da Dz7"
+  },
+  {
+    "id": "S7CYeDXWZf4",
+    "title": "MONTAGEM FETYSTALIZAÇÃO  ☠️🎩 MC HUGO DALESTE, MC BM OFICIAL - Dj Menor Da Dz7"
+  },
+  {
+    "id": "baXw1B3D-fY",
+    "title": "MONTAGEM GYSTALEYS 💀👾 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "_xr2uaNkkls",
+    "title": "MONTAGEM NYTRÉRYXI 🎭🩸"
+  },
+  {
+    "id": "XXnfgqBelwc",
+    "title": "ZN WLASCT  💎🚀 Mc Vitinho Avassalador - Dj Menor Da Dz7"
+  },
+  {
+    "id": "ym8QnjXKofw",
+    "title": "ZN NOTSIRBILAK 👾"
+  },
+  {
+    "id": "aoMVBN4NjaE",
+    "title": "ZN RITCALIST 💎🎰 MC PRR FELIPINHO - Dj Menor Da DZ7"
+  },
+  {
+    "id": "Cg7tCO05omw",
+    "title": "MONTAGEM HYSXTALIY 🪓🧬 MC MENO BRAGA - Dj Menor Da DZ7"
+  },
+  {
+    "id": "Oa5CHgq7AL0",
+    "title": "MONTAGEM V7STARYX 🐉🕷 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "MbBxRT6VdXw",
+    "title": "ZN CLYPTORIANA 🎶💉 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "QAshMfOjGcc",
+    "title": "MONTAGEM ZERISTART ☣🔮 - Dj menor Da Dz7"
+  },
+  {
+    "id": "qHEj1PrUNn0",
+    "title": "BERIMBAU DISFRITYXT 🏹 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "17wdyXQ1NZU",
+    "title": "AUTOMOTIVO YXYLIST 🛡️🎚️MC KITINHO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "e8mKa266G1E",
+    "title": "ZN ATABACASCTY 🥁🐉 MC PRR FELIPINHO - Dj Menor Da Dz7"
+  },
+  {
+    "id": "peEKcczRHGU",
+    "title": "MONTAGEM TROLICATÌCA 🎰🎳 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "wYEY-VTOCFU",
+    "title": "AUTOMOTIVO YXYISRALITAL 👑🏹 - DJ MENOR DA DZ7 & DJ MP7 013, MC LEKÃO"
+  },
+  {
+    "id": "JtSOUdL4Hfc",
+    "title": "BERIMBAU KINELIS 🧙🏽‍♂️⚓ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "pktoLHNYqt4",
+    "title": "MONTAGEM WOSMLTY 🦅🪼 - DJ MENOR 7 & DJ Menor Da Dz7, MC BM OFICIAL"
+  },
+  {
+    "id": "ut_xNWzx9t0",
+    "title": "MONTAGEM YSGÍFICTIO 🐉🎰 MC LC - Dj Menor Da Dz7"
+  },
+  {
+    "id": "F2ZTGeFeVzo",
+    "title": "ZN CLANDRSTINAY ⚠️☣ MC K3 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "umImA9LUfOY",
+    "title": "MONTAGEM TECKISTICA 🀄🎴 - Dj Menor Da Dz7"
+  },
+  {
+    "id": "uI52Excr9YM",
+    "title": "MONTAGEM JUSTA CAUSA - Dj Menor Da Dz7"
+  },
+  {
+    "id": "dOz5P_NiqNY",
+    "title": "MONTAGEM SOWNDS 🛰🚀 - DJ Menor Da Dz7"
+  },
+  {
+    "id": "_kttEOBJD2w",
+    "title": "MONTAGEM CLANROATY 🧞‍♂️ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "rjX4GeSfcPY",
+    "title": "MONTAGEM IMESEDY 🐉🀄 - DJ Menor Da Dz7"
+  },
+  {
+    "id": "N9CUWLsQtKw",
+    "title": "MONTAGEM NOVA HOLANDA 🐦‍🔥🐲 - DJ Menor Da Dz7"
+  },
+  {
+    "id": "LCjXq6ARv_U",
+    "title": "MONTAGEM LATRONIOS YASK 🪐🧲 MC BM OFICIAL - DJ Menor Da Dz7"
+  },
+  {
+    "id": "DTIQGGyuTGs",
+    "title": "MONTAGEM DIAMANTY 🏰🗽 MC BM OFICIAL, MC Gw - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "qayB0sur4dE",
+    "title": "ZN MELYTRÁGIC 🛡💎 MC SANTOSZ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "eqqcAEwiiJE",
+    "title": "ZN VOCALYSTION 🕳🧪 MC ROBA CENA - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "5xleIi14Oj8",
+    "title": "MONTAGEM LACTASLIDE55X 🎶💎 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "qwmzMjUUXQ8",
+    "title": "MORANGO DO AMOR 🍓 -  MÃOZINHA MC & SONECA MC - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Y9tBfgVhpuk",
+    "title": "MONTAGEM RAGEMODE ⚡👺 - DJ MP7 013 & DJ MENOR DA DZ7"
+  },
+  {
+    "id": "CbBpjPuL1e8",
+    "title": "V222222 🎶🍀 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "rR6b1onWn40",
+    "title": "MONTAGEM VAI FUDE SUA PIRANHA 🏄🏽‍♂️🎶 MÃOZINHA MC, SONECA MC - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "VGwXnFXCuTY",
+    "title": "ZN TRATÍLIST 👽🌌 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "7-Te0DeIjjs",
+    "title": "ZN FATRÍCA 🍄🍀 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "ArUl9hG9mNQ",
+    "title": "MONTAGEM HISFÉRICATIVA 🏆🎖 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "aVdKLvU0heg",
+    "title": "MONTAGEM V7!7!7!7!7! ⚗️⚔️ MC Gw - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "aj6bA8fxKGc",
+    "title": "SET ESPECIAL 20k 🎉🪅 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "e02WZviEeKU",
+    "title": "MONTEGEM LIXTÁYTA 🔪⚗️ MC BM OFICIAL - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "dH4OiZn6-e8",
+    "title": "ZN MAGNACTÍCA ⚓🌌 MC PEDRINHO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "g8d6OXj7l8U",
+    "title": "MONTAGEM NECLITICÁ ☪️ MC MENOR BRAGA - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "2Qyvz-ak-8Y",
+    "title": "MONTAGEM CREZÍNTAL 👺 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "euChf2PwmTU",
+    "title": "ZN MAROLADISSIMA 5 🚀🛸 MC PRR FELIPINHO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "3am_dzNnB8k",
+    "title": "BERIMBAU NEFRAGÍO 🚂✨ - DJ MENOR  DA DZ7"
+  },
+  {
+    "id": "F8msdlfHdmo",
+    "title": "MONTAGEM NEGLYSTER  🌌🎴MC QsJ, MC BM OFICIAL [ DJ MENOR DA DZ7]"
+  },
+  {
+    "id": "l8u2UrXUOAc",
+    "title": "MONTAGEM AURA ⛎☠🎱 MC BM OFICIAL - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "16bdzrpyx90",
+    "title": "BERIMBAU INDIANYT  🎭✨- DJ MENOR DA DZ7"
+  },
+  {
+    "id": "cp7ucLYu_aU",
+    "title": "ZN CYLKTA 🔱⚜ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "XSumRLhEa2o",
+    "title": "AUTOMOTIVO XACYT ☣🔮 MC NITO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "YvG0jyA-yj4",
+    "title": "MONTAGEM CAPYT Ⓜ💎 MC GW, MC VN - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Gl6GSumLwlo",
+    "title": "MONTAGEM YIBERLAÍ 🎱🎴 MC GW - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "I9yXcHOMwEM",
+    "title": "MONTAGEM LUCRALYT 🌌☠ MC CRAZY 013 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "odpGGFmHT2o",
+    "title": "MONTAGEM MOANZOÍCA 🛸🚤 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "MwlrqSIxbj0",
+    "title": "ZN TRALSTY 🎡🔮 MC DOM - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "hj3CRxxqHPA",
+    "title": "ZN ARTISTIY 💎🎻  MC VUK VUK, MC JP - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "VjyiiPwNoWU",
+    "title": "MONTAGEM MOANÍCAY 👁‍🗨🩸 MC DENNY - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "mDa3fT2QBa0",
+    "title": "BRUXARIA SILVESTRE 🧙🏽‍♂️🌟 MC MAICON - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "04ZTMydFvow",
+    "title": "MONTAGEM YAKUSAXY ☠🍁 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "tqs6cOeJ8sY",
+    "title": "BERIMBAU AUCATRÍAN ☣☯ MC MENOR JV - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "b-CxHRgIqIQ",
+    "title": "ZN CARDÍTY 🌌⚜ MC SUSUZINHA - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "73pnLZE5k9E",
+    "title": "MONTAGEM MATRÍXADA ✨🎴 MC JEAN DA ZO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "da2AwNB4HpM",
+    "title": "ZN ISOLTY 🦹‍♂️💠 MC RESTRITO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "rvURf2iVu0g",
+    "title": "ZN ISFICYCA 🈹👑 MC VUK VUK - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "BOXJ2brAHE8",
+    "title": "AUTOMOTIVO SAXZADA 🎷 MC MAGRINHO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "dZNIJSRVSHI",
+    "title": "MONTAGEM YFRITALICAS 🎴♣ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "98BT8sspku8",
+    "title": "MONTAGEM MOTILYTAR 🚂✨ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "z1MJY16jDHg",
+    "title": "MONTAGEM VISYTCA  ☣☠ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Fts-mtdxdaM",
+    "title": "MONTAGEM HISTRIC 🏴‍☠️☠️ MC VN, MC Nego Pumma - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "MKGlZ-m72qM",
+    "title": "MONTAGEM GEOMETRICY 💀🩸 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "cEhoZHYaGFI",
+    "title": "ZN MAROLYT 💎🎱 MC RAFA 22 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "8moZXUjVkV8",
+    "title": "ZN MYISTALYCA 🥁🛠 MC CR DA Z/O - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "iJ3V0346e24",
+    "title": "V9!9!9!9!9! 🌌 - DJ MENOR DA DZ7 & DJ JEAN 011"
+  },
+  {
+    "id": "7rZLKecQFgM",
+    "title": "ZN BYSLTALEY ⭐️🍀 MC TALIBAN - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "__uyPlgz-Ic",
+    "title": "ZN PERFECTYA 🩸🗽 MC GW - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "3tNumzYOfDE",
+    "title": "MONTAGEM GYSTRAYCA ♣🎴  MC LUIS DO GRAU - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "2ICDwzo8GE4",
+    "title": "AUTOMOTIVO TRALÍCITAYSTI ♣☠ MC NITO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "kHlVdW3P4Wo",
+    "title": "ZN HYSFERIC 🎴☣ MC RD - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "oxixV1O2Cx8",
+    "title": "MONTAGEM YISTONY ❄️👹 MC MAGRINHO - DJ MENOR DA DZ7 & DJ MP7 013"
+  },
+  {
+    "id": "nmnbBfdIOhE",
+    "title": "ZN YSPLHEIA 📯💎 MC NITO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "FjAiizjd9Wk",
+    "title": "MONTAGEM ALGMOTI☯️N 2 💎👹 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "fwgoeQb42a8",
+    "title": "Zn MAROLADISSIMA 4 ♣🌟 MC PRR FELIPINHO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Olp8hh5OPTk",
+    "title": "MONTAGEM AMERICAN PIE 2 🗽🌟 - DJ MENOR DA DZ7 & DJ MP7 013"
+  },
+  {
+    "id": "VOpgcSneemM",
+    "title": "MONTAGEM YSHTORIC 🎴♣️ MC RD - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "oMyaOAROay0",
+    "title": "MONTAGEM ALGMINATIONS 💫🈹 MC LUIS DO GRAU, MC EDU 011 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Ei3z-L8-xJ8",
+    "title": "BABA NA PIROK* DEPOIS TU 😈🎈 MC MENO BRAGA - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "bSg2Zw8mts8",
+    "title": "MONTAGEM WISTONAL 🛸🌌 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "D82fF5jnpTQ",
+    "title": "v100000000000 🪐☣ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "tXKvtRqf2_U",
+    "title": "MONTAGEM AULITÁCILATICA 🎆☠ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "sJcjZ0P8w6k",
+    "title": "MONTAGEM MALÁDONADRITY 💫🈹 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Oz3IaIkwHqs",
+    "title": "ZN YSTORIC ✨㊗ MC KARINA, MC RAFA 22 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "UIkEDLHLCIM",
+    "title": "MONTAGEM DA SACANAGEM 🎭🌟MC PLAY - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "dneO8vyDtN8",
+    "title": "MONTAGEM SURFISTICA 🌌🏎 MC MAGRINHO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "lyih5iMHiIc",
+    "title": "ZN DA BANDIDAGEM ☯👺 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "g6CdhLZNjXQ",
+    "title": "MONTAGEM CLARIVIDÊNCIA V9999 🎰🎩 MC GW - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "u_c0ztFzbu0",
+    "title": "MONTAGEM AUSTÍCARITARIA 🏎🛸 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "S58NccRKLek",
+    "title": "ZN ANCESTRAL ✈️💎 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "vdjvdCeMtqI",
+    "title": "MONTAGEM MEDOLYMELT 🍁💎 MC VN - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "uV8ukgE0UZw",
+    "title": "ZN APELIDADA 🪐🌌 MC MAGRINHO - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "CsnC0W3Sllw",
+    "title": "SET 19K 💎🎉 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "6abNGP_iawk",
+    "title": "ZN DE CANALHA 📯👺 MC GW - DJ MENOR DA DZ7 & DJ SARAIVA"
+  },
+  {
+    "id": "c2eFtl2YEzg",
+    "title": "MONTAGEM AMERICAN PIE 🗽🌟 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "3KjBvQmxijw",
+    "title": "MONTAGEM ZN CLADOPÓRA ✨🎆 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "beX9RljV6LQ",
+    "title": "MONTAGEM KALIBRISTON 🍬😈 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "DuIo_uCzE38",
+    "title": "MONTAGEM VIDRATÍCA 🧪🧬 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "w1ztdL3ONO8",
+    "title": "MONTAGEM CAPTZADA ㊙👺 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "-cnDq48ztbE",
+    "title": "MONTAGEM FENOLFTALEÍNA MASTRAL 2 🍀⚡ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "nShH-NKyZdc",
+    "title": "MONTAGEM VOLCALDEMON 🎃🩸 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "yLKr1vECokA",
+    "title": "MONTAGEM CLANDESTINA LETRAFICA 🔱🌟- DJ MENOR DA DZ7"
+  },
+  {
+    "id": "lbNKkHTtSB0",
+    "title": "MONTAGEM MALIDRICO CALÍPTARS ㊗💫 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "O7MjSBb1ymQ",
+    "title": "MONTAGEM GRAVITACIONALISTA 💫🩸 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "KqgEuEsoOSY",
+    "title": "MONTAGEM MELANCOLIA ✨⚜ - DJ MENOR DA DZ7, MC CRAZY 013"
+  },
+  {
+    "id": "c2KQj1TXlHo",
+    "title": "ZN DEMATRÍCA 👺🩸 - DJ MENOR DA DZ7, MC QSJ"
+  },
+  {
+    "id": "snGPCNpD2ns",
+    "title": "MONTAGEM TRÍCALIPSO 🎰⚠️ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "47hqRc7DigU",
+    "title": "ZN METÁFELICA ☯️👹MC LEMOS ZS - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "vS35q5lYGGE",
+    "title": "MONTAGEM CALÍTONICA YIST 💎👺 MC BM OFICIAL - DJ MENOR DA DZ7 & DJ PIKENO MPC"
+  },
+  {
+    "id": "9QZgfwtSJ7w",
+    "title": "BOTEI 2 PRA MAMA 🤫👋🏼 - DJ MENOR DA DZ7, MC LEMOS ZS, MC QsJ 🩸"
+  },
+  {
+    "id": "5xvE4S83xpc",
+    "title": "DEPRESSÃO O CARALHO 🩸👺 - DJ MENOR DA DZ7, MC MENOR PAULISTA"
+  },
+  {
+    "id": "j6pcwMzM_jY",
+    "title": "MONTAGEM ALGMOTI☯️N 💎👹 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "lcnC2JaGwnA",
+    "title": "MONTAGEM CASHD 💲💠 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "DvlQ2xVZpeI",
+    "title": "NEM TENTA CONCORRÊNCIA KKK ⚜😈 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "0aH0h3Rig-A",
+    "title": "É O💲 C🅰PETA NÃO ADI🅰NTA 😈👺- DJ MENOR DA DZ7"
+  },
+  {
+    "id": "azUHwre_c50",
+    "title": "NA RELIKIA KIK🅰 NI MIM - DJ MENOR DA DZ7 🉐㊙"
+  },
+  {
+    "id": "0orz8yKro9I",
+    "title": "MONTAGEM ARTIFAL QUÂLIDAD ⚜💲  - DJ MENOR DA DZ7, MC LUIS DO GRAU"
+  },
+  {
+    "id": "e66KkbBKRpo",
+    "title": "GERAÇÃO 2013 - DJ MENOR DA DZ7, MC BM OFICIAL"
+  },
+  {
+    "id": "w0A6XsnBqAA",
+    "title": "ZN DO GIN 🩸🤬 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "UieGK8TorCQ",
+    "title": "MONTAGEM DEMÔN ZN 😈🩸 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "hKIK7Xhb4fI",
+    "title": "BOLDIN DA SORTE 🍀💎 - [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "7Xui9QUf5Ag",
+    "title": "SET FINAL V22094 💎✨"
+  },
+  {
+    "id": "GaAh8tuP0q0",
+    "title": "MONTAGEM CANNABIS 🍁- DJ MENOR DA DZ7"
+  },
+  {
+    "id": "jvPfN22v-sk",
+    "title": "BERIMBAU DA SEXÓLOGIA 🉐🎰 - DJ MENOR DA DZ7, MC CRAZY 013"
+  },
+  {
+    "id": "ZosIp9yqVEc",
+    "title": "CRIMINALIDADE PLANEJADA 🔞⚒️ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "QwdxIm3nP8g",
+    "title": "BERIMBAU CRISTALIZADO 🔮7️⃣ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "Q6H651q0xWY",
+    "title": "V999999999 🛸🛰 - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "n1E4Oq3uWAg",
+    "title": "TRALÍCA INTELECTUAL 🛸🎠 - DJ MENOR DA DZ7 & DJ ROSSINI 𝒁𝑺"
+  },
+  {
+    "id": "Inj5r_gnwr4",
+    "title": "ZN TEORIA 🧠⚗️ - DJ MENOR DA DZ7, MC GW"
+  },
+  {
+    "id": "oIskUX8WF1g",
+    "title": "BERIMBAU DILATRADO 🛰🗽 - DJ MENOR DA DZ7 & DJ BNF ORIGINAL, MC SILVA ZN & MORTYS 𝒁𝑺"
+  },
+  {
+    "id": "M6dUYOSe0no",
+    "title": "BERIMBAU N3CAPITALISTA 🛰☠️  - DJ MENOR DA DZ7, MC CRAZY 013"
+  },
+  {
+    "id": "qAgaSm5HAeY",
+    "title": "CRAKITA LATRÍFICAL 2  ⚜💎- DJ MENOR DA DZ7 & DJ BK7 ORIGINAL"
+  },
+  {
+    "id": "b1IjQPdiXms",
+    "title": "SQUASH LEGÍTIMO 🪓🗽 - DJ MENOR DA DZ7, MC GW"
+  },
+  {
+    "id": "vOTA974iRe0",
+    "title": "ADMINISTRAÇÃO CIENTÍFICA 10.0 🔭🦠 - DJ MENOR DA DZ7 & DJ GOMEZ 011, MC MARISA PESCADORA & GW"
+  },
+  {
+    "id": "Om_6mUDL53w",
+    "title": "ORQUESTRAMENTO CIRÚRGICO 🗽🗼 - DJ MENOR DA DZ7, MC ROBA CENA"
+  },
+  {
+    "id": "qLj0UQIM0ak",
+    "title": "SET 18k 🪓  - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "0Cn02sM5r28",
+    "title": "ADMINISTRAÇÃO CIENTÍFICA 9 🧨🩻 - DJ MENOR DA DZ7 & DJ TWL"
+  },
+  {
+    "id": "kklV8Fn0HTE",
+    "title": "ADMINISTRAÇÃO CIENTÍFICA 8 ⚔️🪓 - DJ MENOR DA DZ7 & DJ GOMEZ 011"
+  },
+  {
+    "id": "RlCJPJJXf7Y",
+    "title": "MONTAGEM ADMINISTRAÇÃO CIENTÍFICA 7 📿🕳 - DJ MENOR DA DZ7 & DJ MENOR C15"
+  },
+  {
+    "id": "_nXfWhyuUnU",
+    "title": "MONTAGEM ASPÉCTRA ♨️⚜️ - DJ MENOR DA DZ7, MC BM OFICIAL"
+  },
+  {
+    "id": "BgVmVujo0OQ",
+    "title": "MONTAGEM CLARIVIDÊNCIA DO CARALHOOO 😡💣 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "3WWIxnD5FNY",
+    "title": "MONTAGEM ELGUN AGNUS ⁉️🉐 - DJ MENOR DA DZ7 & DJ VICK DA DZ7"
+  },
+  {
+    "id": "2PbxHRZ_onY",
+    "title": "MONTAGEM YSTRACITY LIRYC - DJ MENOR DA DZ7 & DJ P4k 🔮🧬"
+  },
+  {
+    "id": "4vs_6sHaL7I",
+    "title": "MONTAGEM 3$TRALÍTICOS MENTAL 🌀🎪 [ DJ MENOR DA DZ7 & DJ P4k ]"
+  },
+  {
+    "id": "ZoYVY5zKd1s",
+    "title": "MONTAGEM CAELESTIS REDITUS 👑🐉 [ DJ MENOR DA DZ7 & DJ JEAN 011 ]"
+  },
+  {
+    "id": "26RMmgzg8mw",
+    "title": "ADMINISTRAÇÃO CIENTÍFICA 6.0 🧪☢️ [ DJ MENOR DA DZ7 & DJ GOMEZ 011 ]"
+  },
+  {
+    "id": "GPlM1aF6OMw",
+    "title": "MONTAGEM CARALHEIRA 🥊🎲 [ DJ MENOR DA DZ7 & DJ FLOW ZN ]"
+  },
+  {
+    "id": "fI-XB5wqn7s",
+    "title": "MONTAGEM VIA LÁCTEATRÍA ⚒️🚀 [ DJ MENOR DA DZ7 & DJ MATH ORIGINAL ] MC LEMOS ZS"
+  },
+  {
+    "id": "59MYBF3EqpU",
+    "title": "MONTAGEM DE MALANDRO 🩸☯️ - DJ MENOR DA DZ7 & DJ GAFTY DA Z/O"
+  },
+  {
+    "id": "KuxNbmSxOOE",
+    "title": "MONTEGEM CHIVAS FRETÍCAL ☯️⚒️ [ DJ MENOR DA DZ7 & DJ THOMAS 011 ]"
+  },
+  {
+    "id": "fxmOib8RfdY",
+    "title": "MONTAGEM CRAKITA LATRÍFICAL 🈳💠🏴‍☠️ [ DJ MENOR DA DZ7 & DJ BK7 ORIGINAL ]"
+  },
+  {
+    "id": "TEI3nqZ6tKo",
+    "title": "SLOWED 0 🥇"
+  },
+  {
+    "id": "t-e1qEbyQn4",
+    "title": "MONTAGEM ULTRA QUALIDED 🧩🎗 [ DJ MENOR DA DZ7 & DJ DRAGON ZL, DJ THOMAS 011 ] MC LEMOS ZS"
+  },
+  {
+    "id": "yn-hb0MIZlM",
+    "title": "SIMPLESMENTE OS 3 FINALISTAS 🈳💠 - [ DJ MENOR DA DZ7, DJ THOMAS 011 E DJ MATH ORIGINAL ] MC MANU"
+  },
+  {
+    "id": "Lx8umpgN1yg",
+    "title": "MONTAGEM RERARQUÍA LIKAFISTA 🪙🪬 [ DJ MENOR DA DZ7 & DJ MATH ORIGINAL ]"
+  },
+  {
+    "id": "plCM41_z79A",
+    "title": "MONTAGEM HORIZONTALIS IGNIS 🇮🇹  • [ DJ MENOR DA DZ7 & DJ BAKI DA ZN ]"
+  },
+  {
+    "id": "gNCfO83wqEU",
+    "title": "MONTAGEM QUÂNTICO PULCHRA 2 ☔ • DJ Menor da Dz7 & DJ Sllow ZN"
+  },
+  {
+    "id": "WTS6qU56UrI",
+    "title": "MONTAGEM NEOLÍTICO HARTOGRAL 🗽🈳 [ DJ MENOR DA DZ7 & DJ SLLOW ZN ]"
+  },
+  {
+    "id": "cVOHo1y-0PQ",
+    "title": "MONTAGEM ERECTÁRIS MULTÍGENUS 2.0 🈳🏆 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ] MC ZUDO BOLADÃO"
+  },
+  {
+    "id": "E7h3_5_imII",
+    "title": "MONTAGEM ESPERATIVA ESTELACTÍCA 🧊🍀 [ DJ MENOR DA DZ7 & DJ THOMAS 011 ] MC MAROLADÃO"
+  },
+  {
+    "id": "NHTr8P6YL_8",
+    "title": "MONTAGEM FISTRALÍCA ATLATICA 🎲🎻 [ DJ MENOR DA DZ7 & DJ KING ZL ]"
+  },
+  {
+    "id": "f8Iv2jJu4a4",
+    "title": "MONTAGEM VINGATIVA NEURAL 🗼🏰 MC PRISCILLA DE OZ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "irmbq2A8SoI",
+    "title": "MONTAGEM SUCÇÃO OVULAR 🍀🗽 MC PRISCILLA DE OZ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "DGvNr4G39eo",
+    "title": "MONTAGEM VITRALÍCIA NEURAL 💎✒️ [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "ef90qbGHJDA",
+    "title": "MONTAGEM HIGRATIFÍCA BRITACIONAL 💎✨ [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "bkqDo6Bwjdg",
+    "title": "CL🅰️RIVIDÊNCI🅰️ EXTINT🅰️ 14 • MC GW [ 𝑫𝑱 MENOR DA DZ7 & 𝑫𝑱 BRYAN 7 ] 🃏"
+  },
+  {
+    "id": "8AXCLpee_D8",
+    "title": "ZN MAROLADISSIMA 3 🃏🍁 - MC PRR FELIPINHO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "uq1KwnscKWI",
+    "title": "ZN DO MELHOR 🌟✨ MC SANTOSZ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "H42SxKe2YwQ",
+    "title": "ZN PRA USUÁRIOS 🃏💎[ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "EZj4Wa6Yfh4",
+    "title": "MONTAGEM CLARIVIDENCIA EXTINTA 13 💫🌟 [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "RyP3BOgSnRI",
+    "title": "FRAGMENTAÇÃO ESTÉREIS • MC GW • DJ MENOR DA DZ7 & DJ SHADOW ZN 🃏👾"
+  },
+  {
+    "id": "y1eIEHD-oKo",
+    "title": "MONTAGEM VIVENTÍCADA ARTENAL  2 ☄️👾 [ DJ MENOR DA DZ7 & DJ FLOW ZN ]"
+  },
+  {
+    "id": "-RT6_Jqrd-Q",
+    "title": "BERIMBAU $2 🔮☯️ - MC MAGRELO FG, MC SANTOSZ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "O5JA3g5z0sI",
+    "title": "O VERDADEIRO REI DO AUTOMOTIVO 2 🩸- MC SANTOSZ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "VmWWsCY5V7o",
+    "title": "MONTAGEM GLITÁRES BRISTACIONAL ☠️⚗️ - MC SANTOSZ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "kT_Iv4BBhA8",
+    "title": "MONTAGEM METÉRIFICO QUILOFÍCO 🃏🎰 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "bZHxJrePgNs",
+    "title": "MONTAGEM CRITÁSFICA NERDTAL 👾🐲 [ DJ MENOR DA DZ7 & DJ BRYAN 7 ]"
+  },
+  {
+    "id": "MYNNUraVA54",
+    "title": "MONTAGEM QUÂNTICO PULCHRA ☔ • DJ MENOR DA DZ7 & DJ Sllow ZN"
+  },
+  {
+    "id": "DuUxFjEN8I8",
+    "title": "MONTAGEM CUPULA AEROGRAFICA 👁️🎯 - [ DJ MENOR DA DZ7 & MARQUES MPC ]"
+  },
+  {
+    "id": "OA3W8Dgh110",
+    "title": "MONTAGEM VIVENTÍCADA ARTENAL ☄️👾 [ DJ MENOR DA DZ7 & DJ FLOW ZN ]"
+  },
+  {
+    "id": "N2TS7cHfVq0",
+    "title": "SET 16K ✨ - DJ MENOR DA DZ7"
+  },
+  {
+    "id": "xU04mL1DCWk",
+    "title": "MONTAGEM ARQUIVER LENDER 🎃🎰 [ DJ MENOR DA DZ7 & DJ G4P ORIGINAL ]"
+  },
+  {
+    "id": "_Fw6LZYWL_M",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 12 🛰⚔️ - MC GW [ DJ MENOR DA DZ7 & DJ TWL ]"
+  },
+  {
+    "id": "CHADlbyFpKc",
+    "title": "MONTAGEM DOS REIS 4 🎭🎯 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "GhVpBfwjgxw",
+    "title": "MONTAGEM ÆTRØMETÏS OTRØDIS 🛰🛸 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "UF_Y4dIYa_4",
+    "title": "MONTAGEM NOMAJÓIACA 2 💎⚛️ [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "utloByrP3rY",
+    "title": "MONTAGEM NOMAJÓIACA 💎⚜ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Er8qxeyGG4s",
+    "title": "ZN MALADÍFICA ✨🏑 - MC 7BELO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "opD6VI-H4YY",
+    "title": "MONTAGEM JURIDICA VERTICIONAL 3 👾✨ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "dYelC9i_CPo",
+    "title": "ZN SUPLEFÍCADA 🗡🤺 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "sNRC_CEMwuo",
+    "title": "MONTAGEM LACRIPÉTIO MARGINETS 2 🫁🏔️[ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "Aq93Ducvbkg",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 11 ✨🚀 [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "rnXvEv3wDNU",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 10 👾🤺 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "t8vKek1cf8M",
+    "title": "MONTAGEM ARDIGRATICAL 777 🎰 [ DJ MENOR DA DZ7 & DJ MENOR T7 ]"
+  },
+  {
+    "id": "kIufC1bJu68",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 9 👑🚂 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "UnQf4qST4AA",
+    "title": "MONTAGEM CLÃPESDIARIA ARTOGRAL, MC MAROLADÃO [ DJ MENOR DA DZ7 & DJ ARTHUR ZL ]"
+  },
+  {
+    "id": "i095WAONqu0",
+    "title": "MONTAGEM INOVALÍSTICA 2 🏆🎶 [ DJ KEVYN DO RC & DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "AliL2H435gY",
+    "title": "MONTAGEM LÁSTIVA GEGRÁFICA 2 🦠☠️ [ DJ MENOR DA DZ7 & DJ TWL ]"
+  },
+  {
+    "id": "ljU3pM9NpNc",
+    "title": "MONTAGEM O MAGNÍFICO 👑🚀 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "KLDVN8j6isM",
+    "title": "TRIVICIALISMISTA 🎲🎮 [ DJ MENOR DA DZ7 & DJ MENOR T7 ]"
+  },
+  {
+    "id": "BKURj8cBKdA",
+    "title": "MONTAGEM ERECTÁRIS MULTÍGENUS  💫✨ [DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "Jfl1Kf8rbjA",
+    "title": "MONTAGEM DOS REIS 3 🗽👑 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "BnyImCKwAz0",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 7 🍬🚂 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "aR0miNxCHvA",
+    "title": "MONTAGEM ANCESTRALIDADE NUTRIDRINK 2 👑🎪 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ TWL]"
+  },
+  {
+    "id": "6HI5-Si2znY",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 6 🗽⚔️ [ DJ MENOR DA DZ7 & DJ TWL ]"
+  },
+  {
+    "id": "TvkX68E7PBM",
+    "title": "LATRILÍSMO FRITÍCAL 🧊🛸 [ DJ MP7 013 & DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "RcCp2S7jp1M",
+    "title": "MONTAGEM SAPECLÍTARIA FERMINAL 🛸🎯 [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "qlHrAD9iQhE",
+    "title": "MONTAGEM INTERSE HIDRICA 🎗️🏮- [DJ MENOR DA DZ7 & DJ G4P ORIGINAL]"
+  },
+  {
+    "id": "mveCtuv07mQ",
+    "title": "SIMPLESMENTE OS MELHORES 4 🪩🛸 [ DJ MENOR DA DZ7 & DJ TWL ]"
+  },
+  {
+    "id": "R3L95nZTS8Y",
+    "title": "MONTAGEM SINTONYA DE MURPHEY 👾👑 MC QSJ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "uNBB7EU7g58",
+    "title": "ESPECIAL SET DOS 15K 🤬💫 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "W92to3_2Nuc",
+    "title": "MONTAGEM SUPLIMINEAR ARTIFÁTICA 🛸🗽 [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "GhA1SVsGVag",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 5 🌊 | ▪︎ DJ MENOR DA DZ7, DJ SHADOW ZN & DJ TWL"
+  },
+  {
+    "id": "uezgp_qxnAc",
+    "title": "MONTAGEM HIFICA CRISTALICA 2 💀🧊 [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "uEmYRkPslgI",
+    "title": "MONTAGEM POMPORISMO COADJUVANTE 👺👾 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Qi06H9ZSI-E",
+    "title": "MONTAGEM RÉPLICARIA ESTEREOTIPADA 2 👾👺 [ DJ MENOR DA DZ7 & DJ TWL ]"
+  },
+  {
+    "id": "jyEK8iKkLfw",
+    "title": "MONTAGEM DILAPIDAR GEOGRÍFICO 2 🔪☠️ [DJ MENOR DA DZ7 & DJ TWL]"
+  },
+  {
+    "id": "sHIw3q6Cdi0",
+    "title": "SIMPLESMENTE OS MAGNÍFICOS 😈☯️ [ DJ MENOR 7 & DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "_Vn51qly1zY",
+    "title": "MONTAGEM FIBRILAÇÃO TÉORICA 2.0 🎭☯️ [ DJ MP7 013 & DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "pguI-qgPQ9Y",
+    "title": "MONTAGEM JUDITICA VERTICIONAL 2 🤬👾 [ DJ MENOR DA DZ7 & DJ SHADOW ZN ]"
+  },
+  {
+    "id": "kaH_5bEG_XE",
+    "title": "MONTAGEM NINFUS LATRIFIAL 🧬🔆 [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "oXrzhDuIzJk",
+    "title": "ADMINISTRAÇÃO CIENTÍFICA 5 🔮💫 [ DJ MENOR DA DZ7 & DJ MENOR C15 & IGOR VILÃO ]"
+  },
+  {
+    "id": "Wu8aIPZbqc4",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 4 🦠✨ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "oIIdRpqJbQQ",
+    "title": "RITMADA CLIMISTA 2 🐲🍒[ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "jsxfCGrs-do",
+    "title": "ZN SURREALISTA 👿😈 MC BM OFICIAL [ DJ GUILHERME DUARTE & DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "_eKrGl7e0wM",
+    "title": "MULTIVERSALISMO ⚜🔱 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "J-2C3QMHdhU",
+    "title": "MONTAGEM RÉPLICARIA ESTEREOTIPADA 💉🌟 [ DJ MENOR DA DZ7 & DJ TWL ]"
+  },
+  {
+    "id": "bpSOTtSyFGw",
+    "title": "MONTAGEM ANIMAÇÃO CATIVANTE 2🐉🩸 - MC VN CRIA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "YAqnB_-ub5w",
+    "title": "MONTAGEM LACRIPÉTIO MARGINETS 😈💫 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "kGbUfLIAISs",
+    "title": "SIMPLESMENTE O MELHOR 3 ☠️👻 [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "ZlRUPtjnP94",
+    "title": "MONTAGEM LATIM 3 ☪️🔱 [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "f91aWe_GO4Q",
+    "title": "ORQUESTRAÇÃO EQUACIONAL 🎖🧪 MC Vuiziki e VDC [ DJ MENOR DA DZ7 & DJ ALEX BEAT ]"
+  },
+  {
+    "id": "Zm0G8UEXCKQ",
+    "title": "ADMINISTRAÇÃO CIENTÍFICA 4 🏆💫 [ DJ MENOR DA DZ7 & DJ MENOR C15 ]"
+  },
+  {
+    "id": "-vf3cSqZpNU",
+    "title": "MONTAGEM LESTÍCA CELESTIAL 🪐🚀 [ DJ MENOR DA DZ7 & DJ STDZ ]"
+  },
+  {
+    "id": "UCdZuQdIIKs",
+    "title": "MORDENDO O DEDINHO 2 🍀💫 [ DJ MENOR DA DZ7 & DJ EVERTON DA OL ]"
+  },
+  {
+    "id": "VYrKXxFhs6Q",
+    "title": "MONTAGEM FIBRILAÇÃO TÉORICA 🎭☯️ [ DJ MP7 013 & DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "uboxcDhCeQA",
+    "title": "ZN MAROLADISSIMA 2 🍀🩸 MC PRR FELIPINHO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "QIjPPRacgRY",
+    "title": "MONTAGEM LICTUAL MALISTA 🔪👹 [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "odzHIC_GpEw",
+    "title": "MONTAGEM INFROTUS ALUCINÆ🎖🏆 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "PbE4dQ7fmIc",
+    "title": "MONTAGEM FLIGORÍGICA - MC BM OFICIAL 💫🎭 [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "tiq-6-hMvIU",
+    "title": "RITMADA CLÍMISTA 🍀🎳 [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "nS2bQfO8vhU",
+    "title": "ZN ORQUESTRAL 🪕🎼 MC PRR FELIPINHO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "ZWr6VEGjNWc",
+    "title": "ZN MAROLADISSIMA 🍁🍀 MC PRR FELIPINHO & MC MD [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "xKwy5Tq6X8Y",
+    "title": "MONTAGEM HÍSFISÍCA CENTRAL 🎳🎯 MC MAROLADÃO, MC KAUÃ DA DZ4 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "3aBFL9rtrvs",
+    "title": "EMBRAZAÇÃO ROMANA 2090 🥁🪘 MC VK DA VS [ DJ MENOR DA DZ7 & DJ KLP OFC ]"
+  },
+  {
+    "id": "plcq20kt4EU",
+    "title": "MONTAGEM SUPERSÔNICA EXTRAORDINÁRIA 🧪🦠 MC MENOR JV [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "K358h90KD5o",
+    "title": "MONTAGEM ANIQUILAÇÃO NEURÓTICA 🌟💫 MC MENOR JV [ DJ MENOR DA DZ7 & DJ RD DA DZ7 ]"
+  },
+  {
+    "id": "7KRu2bSbZps",
+    "title": "MONTAGEM HIDRÓLOGA FURTIVA 🏆⚔️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "GZvPoc-2gDo",
+    "title": "MONTAGEM LIPTARÉS VERCAL ⚡️🪐 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "BFROzYbewe8",
+    "title": "MONTAGEM HÍFICA CRISTALÍCA 🃏🧬 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "iKb3S45IMFA",
+    "title": "MONTAGEM DILAPIDAR GEOGRÍFICO 🩸🌠 MC PRR FELIPINHO & MC VK DA VS [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "1hO63EyBZzA",
+    "title": "MONTAGEM LÍTOSFÉRA BIÓTICA 🌟🎖️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "MMbhUrli0BM",
+    "title": "MONTAGEM SACRÍFICA CRÍVAL 😈⚒️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "amtroAspQfY",
+    "title": "TROPA DA MARCOLÂNDIA 🍁✨ MC PRR FELIPINHO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "T5qyO6Wrj8w",
+    "title": "RITMADA ALTRÍLICA 🎯🧪 MC PRR [ DJ MENOR DA DZ7 & DJ GUIIH DZ7 ]"
+  },
+  {
+    "id": "j2mAupLLwNU",
+    "title": "MEGA ULTRA BATIDÃO DA ZONA OESTE 🔪☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "HG5qFLugEc8",
+    "title": "SIMPLESMENTE O MELHOR 2🥇🏆 MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "GW_6dnQnS2E",
+    "title": "MONTAGEM VERSÍOLÔGICA MILÍCA 🍀🐲 MC RD & MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Td5f0mZQgCA",
+    "title": "MONTAGEM FÍSTICA NEURAL 🪬🦠  [ DJ MENOR DA DZ7 & DJ MENOR C15 ]"
+  },
+  {
+    "id": "hyR3x4Yzocs",
+    "title": "MONTAGEM LIPROSPERINA ATMOSFÉRICA 🌟⭐️ MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "7EOFUBHeGYI",
+    "title": "MONTAGEM DOS REIS ⚡💰 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ XAVIER ZS ]"
+  },
+  {
+    "id": "U86XJYuA-uU",
+    "title": "MONTAGEM TRIMERÍCA SUPERNOVA 💫💥 MC TCHUTCHUCÃO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "FqM74bFTtGE",
+    "title": "MONTAGEM ASTRÍLICIONAL 👾💎 MCs, DDSV,MAROLADÃO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "ziciKO2pbCM",
+    "title": "SIMPLESMENTE O MELHOR 🥇💫 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "GWtEFFZZQHE",
+    "title": "MONTAGEM EPILEPSIA HEXADÁCTILA 2 🧬👾 - MC SILLVA, & MC BM OFICIAL - [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "DAX6OQe0Sg4",
+    "title": "MONTAGEM SONORIDADE AUCÚSTICA 🧬🎴 [ DJ MENOR DA DZ7 & DJ SHADOW ZN ]"
+  },
+  {
+    "id": "8SbMcf2sGKs",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 3 🍬✨ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "vNQIJPPK8CA",
+    "title": "MONTAGEM GRÍFICA ASTRÍLICA 🏆😵‍💫 [ DJ MENOR DA DZ7 & DJ JEAN 011 ]"
+  },
+  {
+    "id": "yWnNFik-wvo",
+    "title": "MONTAGEM ANIMAÇÃO CATIVANTE  🔮🐲 - MC VN CRIA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "25QyLVSuox8",
+    "title": "MONTAGEM VITUPÉRIO GRIFÍCO 🏆🥇[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "S3vyuwq4KZ0",
+    "title": "MONTAGEM LÁSTIVA GREGRAFÍCA 🧬🍀 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "I2SkBFkQ_uE",
+    "title": "MONTAGEM MALIGNÁREIS VLITÍCO 🎩👾 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Z42zwOz0aiw",
+    "title": "MONTAGEM FILANTROPO HORRÍPILO 👑🍁 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ MENOR C15 ]"
+  },
+  {
+    "id": "RVTY1jaZWIA",
+    "title": "MONTAGEM DEMPACIONAL ESPETÁCULAR 🧫💫 MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "pcAPeTRTm3k",
+    "title": "MONTAGEM CRISTALÍFERA HIDROGRÁFICA 🐉🍀 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ JEAN 011 ]"
+  },
+  {
+    "id": "XgEP3MfQngE",
+    "title": "MONTAGEM REVOLUÇÃO INOVACIONARIA 🌀🌌 MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "r_wJjb3YsDc",
+    "title": "MONTAGEM LIPRASTIVA TRIVACÍONAL 👾🚀 [ DJ MENOR DA DZ7 & DJ MENOR C15 ]"
+  },
+  {
+    "id": "5PMQH_JBDA0",
+    "title": "MONTAGEM CRISTALÍFICA ARTEZANAL 👑🎺 MC VN CRIA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "1jjQMrbO3jE",
+    "title": "MONTAGEM HOMENAGEM AO MOLEJU 🕺🏼💃🏼 MC KRODA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "yWrOMr_q8jQ",
+    "title": "MONTAGEM LEGENDÁREIS TRADICIONAL 👾👹 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ JEAN 011 ]"
+  },
+  {
+    "id": "YS7_AxhV2oA",
+    "title": "MONTAGEM JUTIFICATIVA MONOGRÁFICA 🦠🧪 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "ACl76g1WDhc",
+    "title": "MONTAGEM NAVITACIONALISTA GREGA 🎖️⚡ [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "d8AnNawDqOs",
+    "title": "MONTAGEM CANIBALIZÁREIS CLEÓPATRA 💀🎱 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Qw0bj3DS75Y",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA 2 👁‍🗨🍀[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "G1u30Qqqfqc",
+    "title": "MONTAGEM GLOBALIZAÇÃO MAGNATICA 🎯🎰 MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "3mDjl1H-l5w",
+    "title": "MONTAGEM INCORPORADORA  2.0 🃏 - [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "vQB7aDVxPUY",
+    "title": "O VERDADEIRO REI DO AUTOMOTIVO 🥇🩸 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "l6EX7Rorcag",
+    "title": "MONTAGEM MONTÍCULO ELABORAL 👾🤬 - MC's Kroda & BM Oficial [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "D4Mx4Ld0yv0",
+    "title": "MONTAGEM INTROLUNAR TÉCNICO 🪐🎳 MC BM OFICIAL [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "0EHei8_POG4",
+    "title": "MONTAGEM ARCLIFICORICO MAGNÍFICO 👾👽 MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "r8mwSfaXnMM",
+    "title": "MONTAGEM LANTÁRES HARBITAL MC BM, MC RF 33 🌀🃏 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "NOysubFxE4k",
+    "title": "MONTAGEM DILUIÇÃO QUIMICA ⚜️🪬MC BM OFICIAL [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "eAhYwGpsW5g",
+    "title": "MONTAGEM LATINOAMÉRICA EPIDÉRMICO 🎰✨ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Stm6ifp-qYI",
+    "title": "MONTAGEM BENEPLÁCITA 🧩🪐 [DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "ws5_RuuDgYM",
+    "title": "MONTAGEM VIDÊNCIA FUTURÍSTICA 🎭☯️ [ DJ MENOR DA DZ7 & DJ MP7 013 ]"
+  },
+  {
+    "id": "NJYiFnTNp6M",
+    "title": "MONTAGEM ATRAÇÃO SIMBÓLICA 🎰🌟 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "1SXQEUl0DMQ",
+    "title": "NOVA GERAÇÃO DO ROMANO 🕺🏼👁️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "EJsqVJCzMYg",
+    "title": "MONTAGEM CLADURIACAU ESPECIFICA 👹🔪 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "eV9JA1KeXOs",
+    "title": "MONTAGEM CÁPSULA MORALISTA 🧫🌡️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "rKZ07QPJYyE",
+    "title": "MONTAGEM CLARIVIDÊNCIA EXTINTA ⚔️👁️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "urVRWOR_v18",
+    "title": "MONTAGEM PATRIMONIAL INDIVISÍVEL 🏆🎭 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "EXWJF41eSEI",
+    "title": "MONTAGEM DIFUSÍVEL QUIMIALISTA ⚡🌐 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "zVotHxpvND8",
+    "title": "RITMADA PARAPLÉGICA 👑☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "T26JwxCVrNA",
+    "title": "MONTAGEM EUROPEIA HISTORIALÓGICA 🪬[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "DWiMAqN3mD0",
+    "title": "MONTAGEM HIPOTECÁRIA HOLÍSTICALÓGICA 🧬 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "3dbK1D4nves",
+    "title": "MONTAGEM CLARICIFICACIONAL MÍSTICA 🗡☯️ - [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "aApMWY9GuIc",
+    "title": "MONTAGEM FACISTA CONSTITUCIONAL ☯️🫨 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "8GeMIocJlsA",
+    "title": "MONTAGEM HADITIVA MONTREAL 🪐💫 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "lqh_UHlEUqU",
+    "title": "MONTAGEM ÉSPECTRUALISRA VISIONAL ☪️👿 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "DXXUC0n_mFM",
+    "title": "MONTAGEM ELÉSTRAFO RANDÔMICO 👾👺 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "x2-qNoz8StI",
+    "title": "MONTAGEM MÍNITRICA LEGISLATIVO 💸🤖 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "oRKcRh9hfA0",
+    "title": "MONTAGEM JUDITICA VERTICIONAL 🤬👾 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "buR74a4cuu4",
+    "title": "MONTAGEM NITRITIDO ARMISTÍCO 💀☠️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "nqQEst-Aeds",
+    "title": "MONTAGEM DILATRICAÇÃO MONUMENTAL 🎭🎳 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "QSJl3_lUgok",
+    "title": "MONTAGEM MINILASTRINIDADE HIPÓCRATES 🔮💎 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "oxsO30WQ8Xc",
+    "title": "MONTAGEM LEGIONÁRIO LITIFICIO 🔮💊 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "HDDsQSRb-yE",
+    "title": "MONTAGEM AUCANTRIAL INVERSATICO ✨🧪 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "4iyRKFke41o",
+    "title": "MONTAGEM LITRIGÔNAL MIDIÁTICO 🇧🇷 ☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "AnGIRJVLtLs",
+    "title": "MONTAGEM HIGRÔMETRO LÍTICO 👾☠️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "F-GN-HljQ2w",
+    "title": "MONTAGEM ALUCINAÇÃO HIPNAGÓGICA 👻⚡ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Mf3DCQOrYf0",
+    "title": "SET 10K DJ MENOR DA DZ7 SÓ AS MELHORES ! ☯️✨"
+  },
+  {
+    "id": "yKMYs3B0b10",
+    "title": "MONTAGEM ESTROBOCÓPIA ROMÂNICA ☯️😎[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "DZzbbu8SsTA",
+    "title": "MONTAGEM COMINAR SUTÂNICO 🎰🌟 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "O4LBsWfoXxI",
+    "title": "MONTAGEM CALIPTUS MISCIGENAR 🎷☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "OZ1_zOEja00",
+    "title": "MONTAGEM ÉPSODOMIA DE MODOMICO 🎲🌀 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "S5UHy9502Nk",
+    "title": "MONTAGEM LEMINOSEROTICA RUBÍDEA 🌌👁 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "w2RwWRTTiAs",
+    "title": "SET DOS CORNOS 2.0 ✨🌟"
+  },
+  {
+    "id": "t_mMoU752qw",
+    "title": "MONTAGEM DIFUSÃO NEURÓTICA 🧠🦠 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "9sqJvvHh7fs",
+    "title": "MONTAGEM NÚCLEO PROEMINENTE 🎰🧪 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Ezu7r2k5_cs",
+    "title": "MONTAGEM ANCESTRALIDADE NUTRIDRINK 🩸✨ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Irq_ykcr3dc",
+    "title": "MONTAGEM FENOLFTALEÍNA MASTRAL 🍀⚡ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "GMQiS-I5k5k",
+    "title": "MONTAGEM LATIM 2 👁‍🗨🍁 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "idybAI-GlrI",
+    "title": "MONTAGEM LÁTRIGONOMETRIA MONOGRAFICA 🍀✨[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "m758ddJ9hTI",
+    "title": "MONTAGEM HIPOTENSÃO ORTOSTÁTICA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "alsmPzazriM",
+    "title": "MONTAGEM NEOLAMARCKISMO EPIGENÉTICA 💊☘ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "H7lT33WhBfA",
+    "title": "MONTAGEM FEDERAÇÃO INFOPÉDIA 💫✨ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "nyv2Jg4DZSM",
+    "title": "MONTAGEM SUPLEMENTO NUTRICIONAL 🕳👁‍🗨 [ DJ MENOR DA DZ7 & DJ MP7 ]"
+  },
+  {
+    "id": "LgHLJEsCUxM",
+    "title": "MONTAGEM ESPECTRO ARTIFICIAL 🧬🦠 [ DJ MENOR DA DZ7 & DJ KS 011 ]"
+  },
+  {
+    "id": "Lr4dLBhohm0",
+    "title": "MONTAGEM ARTICULADOR NACIONAL 🩸👻 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "seDodC9dpQo",
+    "title": "MONTAGEM CICATRIZ HIPERTRÓFICA 🌟☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "dPiMIfqid8I",
+    "title": "MONTAGEM TRANSFORMAÇÃO LINEAR 🔮🍁[ DJ MENOR DA DZ7 & DJ MP7 ]"
+  },
+  {
+    "id": "tD7lp6YQkx0",
+    "title": "MONTAGEM CALISTENIA LITERAL 🍬🎭 [ DJ MENOR DA DZ7 & DJ TENEBROSO ORIGINAL ]"
+  },
+  {
+    "id": "q6b9On7PKNM",
+    "title": "MONTAGEM NEOSTALINISMO CICATRIAL 🧪🎇  [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "8c8fz6DOavY",
+    "title": "MONTAGEM VARIÁVEL PROTÓTIPO 🦠💫 [ DJ MENOR DA DZ7 & DJ C4 ]"
+  },
+  {
+    "id": "QzjUg09OEqE",
+    "title": "MONTAGEM ALTERNAMENTE LUCIDA ♣️🌪 [ DJ MENOR DA DZ7 & DJ ALEMÃO 011 ]"
+  },
+  {
+    "id": "LZvkIcVLth4",
+    "title": "MONTAGEM ASTENIA ECOLÓGICAS 🍬🍇 [ DJ MENOR DA DZ7 & DJ MP7 ]"
+  },
+  {
+    "id": "vWsw9WwL_Lw",
+    "title": "MONTAGEM DESIGNAÇÃO ATUAL 💊🩸 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "35wdbaRNhm0",
+    "title": "MONTAGEM AUTÔNOMO ACADÊMICO ☘☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "mmJTfuE5Ufk",
+    "title": "MONTAGEM ENCICLOPÉDIA BRITÂNICA 👾👽 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Bz_ZQxn8o74",
+    "title": "MONTAGEM AEROESPACIAL 🎇💫 [ DJ MENOR DA DZ7 & DJ NEGRESKO ]"
+  },
+  {
+    "id": "RhhMmgNL6rM",
+    "title": "MONTAGEM PÉROLA JUDICIAL ☠☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "b4bYZL6Yi6g",
+    "title": "MONTAGEM LATIM ❌👻 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "FBBNgcxjrw8",
+    "title": "MONTAGEM PROTESTADA ✨🌠 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Am-vQTCSzqc",
+    "title": "MONTAGEM HEBRAICA 🎇🌠 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "mwLoPzOm2cE",
+    "title": "MORDENDO O DEDINHO 🍭🍬 [ DJ MENOR DA DZ7 & DJ EVERTON DA OL ]"
+  },
+  {
+    "id": "Mb631gXhvek",
+    "title": "AUTOMOTIVO SLIDE 🃏☯️🃏☯️🃏☯️ - [ DJ MENOR DA DZ7, DJ KS 011 ]"
+  },
+  {
+    "id": "gWzW4Yy2LrI",
+    "title": "MONTAGEM INTERMINTENTE 💫☯  [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "hsNFczx9gto",
+    "title": "MONTAGEM ELEMENTAL 🛐☄ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "1ceJOy_Hnzk",
+    "title": "MONTAGEM ARQUIVADA 💎☯ [ DJ MENOR DA DZ7 & DJ VST ]"
+  },
+  {
+    "id": "_VXGdwy666s",
+    "title": "MONTAGEM AURORA AUSTRAL 2 ☄☠ [ DJ MENOR DA DZ7 & DJ IGOR VILÃO ]"
+  },
+  {
+    "id": "hiK0h2dWnVw",
+    "title": "MONTAGEM SINTETIZADORA ☯🤬 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "ao9OoV9dFRc",
+    "title": "MONTAGEM INSIGNIFICADA ☠👻[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "eRFw_VMhix0",
+    "title": "MONTAGEM SINÔNIMO PRIVILEGIADO ✨☯️ [ DJ MENOR DA DZ7 & DJ RAFINHA DZ7 ]"
+  },
+  {
+    "id": "dHwiWeZ5xWA",
+    "title": "MONTAGEM INFOGRÁFICA 🤬☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "zrI-1rW0Svc",
+    "title": "MONTAGEM ESTRELA NEBULOSA 👻☣ [ DJ MENOR DA DZ7 & DJ PRÓZINHO ]"
+  },
+  {
+    "id": "h02h7DSpcZE",
+    "title": "MONTAGEM AURORA AUSTRAL ☄☠ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "6uEK_auzG-w",
+    "title": "MONTAGEM HIPNÓTICA [ DJ MENOR DA DZ7, DJ MZL, DJ RAFINHA DZ7 ]"
+  },
+  {
+    "id": "SLFBbxRVCBg",
+    "title": "MONTAGEM SURRA DE PEÇA [ DJ MENOR DA DZ7 & DJ GUI7 ]"
+  },
+  {
+    "id": "w0jEND688EM",
+    "title": "MONTAGEM MATÉRIA GALACTICA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "pF2spWcfciE",
+    "title": "MONTAGEM DANIFICADA 🛐👻[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "zeQ6Tr39Vmc",
+    "title": "MONTAGEM INTERMEDIÁRIA ☯🔥 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "K1zYR61jAGE",
+    "title": "MONTAGEM ASTROFÍSICA 👻☄[ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "o_byHeFifpQ",
+    "title": "MONTAGEM ARTEMÍSIA ☠☯ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "U4LDJKzOrPU",
+    "title": "MONTAGEM SUBTÔNICA ☠️🇰🇷 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "g8-arjkLpJY",
+    "title": "MONTAGEM CAPITALISTA 🎭⚠️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "_lTgYlAtl7M",
+    "title": "MONTAGEM SURPRESA 🃏☯️ [ DJ MENOR DA DZ7 & DJ KS 011 ]"
+  },
+  {
+    "id": "nfqHi2T-nns",
+    "title": "EXPRESSÃO LUNAR 2 🪐💫 [ DJ MENOR DA DZ7 & IGOR VILÃO ]"
+  },
+  {
+    "id": "qUnDZn65WKc",
+    "title": "MONTAGEM REAVALIATIVA 💫☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "EOoKb5BJuOs",
+    "title": "MONTAGEM ESTRATÉGICA ✨🇰🇷 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "YR9s25vXyks",
+    "title": "MONTAGEM ECKO UNILD 🦏🃏 [ DJ MENOR DA DZ7 & DJ JHOW ZS ]"
+  },
+  {
+    "id": "5Xb3_Y726vc",
+    "title": "MONTAGEM ABSORVIDA ❌☣ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "nU0lSQEfSmI",
+    "title": "MONTAGEM ATMOSFÉRICA ☢️🎶 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "P-ZkILFtEbM",
+    "title": "MONTAGEM ANÔNIMA ☣️⚠️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "SGcczXZ96wA",
+    "title": "BOTA COM PRESSÃO X TOMA TOMA - AIRA FLEX [ DJ MENOR DA DZ7 & DJ RAFA DA VM ]"
+  },
+  {
+    "id": "9VioRrtLFQc",
+    "title": "EXPRESSÃO LUNAR 🪐✨[ DJ MENOR DA DZ7 & IGOR VILÃO ]"
+  },
+  {
+    "id": "_kwfrPgG5wk",
+    "title": "5 MINUTINHOS DE IDEIA [ DJ MENOR DA DZ7 & DJ C15 DA ZO ]"
+  },
+  {
+    "id": "kxx6hXCxdKg",
+    "title": "MONTAGEM AGRINOSTICO 🇰🇷☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "hGBemO9gRQg",
+    "title": "MONTAGEM GLOBAL ☄🤬 [ DJ MENOR DA DZ7 & DJ RAFINHA DZ7 ]"
+  },
+  {
+    "id": "h2lzYej6WzE",
+    "title": "MONTAGEM KRIPYTONIT ☯️🤬 [ DJ MENOR DA DZ7 & IGOR VILÃO ]"
+  },
+  {
+    "id": "G0jtX7ksZQY",
+    "title": "MONTAGEM ALÉM OBSCURO ⚠️☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "bKM159yRw5U",
+    "title": "MONTAGEM INJUSTIÇADA 🤬🔥 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "Fo2dOuGPZwg",
+    "title": "MONTAGEM INTERNACIONAL ☯🥵 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "JA1YbcVNIzU",
+    "title": "MONTAGEM PARALELA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "PhFu20Z6nUI",
+    "title": "MONTAGEM QUÍMICA ATÔMICA ⚠️🇰🇷 [ DJ MENOR DA DZ7, DJ BLAKES, DJ KAUAN ]"
+  },
+  {
+    "id": "tuZVyPxXyTE",
+    "title": "MONTAGEM ANTECEDENTE 🤬🔥 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "gDrj4dBfMns",
+    "title": "MONTAGEM NOTÁVEL 🇰🇷☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "M6qGDU-NUkY",
+    "title": "MONTAGEM ESTELAR [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "9xOwOX1wlYc",
+    "title": "MONTAGEM SUBMERSO PARALELO ☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "exshTslGUH0",
+    "title": "MONTAGEM ULTRA INESQUECÍVEL 🎶⚠️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "gSnJjDcFaz4",
+    "title": "MONTAGEM REGULADA 🎭🇰🇷 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "9qKFmuqujBE",
+    "title": "MONTAGEM ALERTA HELIPA [ DJ MENOR DA DZ7 & DJ RAFINHA DZ7 ]"
+  },
+  {
+    "id": "19dkySZEbnA",
+    "title": "CALA A BOCA FDP ⚠️☯️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "fdSIJEIgJds",
+    "title": "MONTAGEM DA FUSÃO [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "slMFGmAkrlc",
+    "title": "MONTAGEM RENOMEADA 🇰🇷 🐉 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "mKywOezA8nk",
+    "title": "ASSOBIO DESTRÓI CRÂNIO [ DJ MENOR DA DZ7 & DJ VST ]"
+  },
+  {
+    "id": "jXxD_AHhtXo",
+    "title": "MONTAGEM MAL OLHADA 🇰🇷🤬 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "0jB3tcccdbQ",
+    "title": "TOMA BOTADA COM TUDO NA XOT4 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "yZXiABS2fl8",
+    "title": "AUTOMOTIVO DAS UMBRELLA [ DJ MENOR DA DZ7 & DJ JHOW ZS ]"
+  },
+  {
+    "id": "mDUpPqH9oDw",
+    "title": "MONTAGEM DETALHADA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "X2feoffzNfY",
+    "title": "GOSTOSO NO XEQUE MATE - MC AMANDINHA ZS, MC 20K [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "MIaB60CCKwc",
+    "title": "VAPO VAPO VS CAVUCADA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "x2g8U3cp6yk",
+    "title": "BERIMBAU DA ANDRÔMEDA ☯️ ☄️ [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "4VWJHHF4Ybg",
+    "title": "MONTAGEM DE NOTA EU TE DOU 100 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "K0pmDbR7FPM",
+    "title": "MONTAGEM BERIMBAU AUSTRALIANO [ DJ MENOR DA DZ7 & DJ JHOW ZS ]"
+  },
+  {
+    "id": "2CLiIJFTiPA",
+    "title": "MONTAGEM CONFUSA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "hPfQRRe6E1M",
+    "title": "MONTAGEM DA NÁUTICA [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "blHy7m2Xbms",
+    "title": "FINO DETONA BATALHÃO 🎭 - MC RW [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "pvgV-J6rGQE",
+    "title": "TUIM DOS ATIVIDADE ☯️ - MC RF 33 [ DJ MENOR DA DZ7]"
+  },
+  {
+    "id": "Z7pUBaVDz64",
+    "title": "A BARBIE TÁ DIFERENTE 2.0 🎭- MC RW DA 015 [ DJ MENOR DA DZ7 ] 2K24"
+  },
+  {
+    "id": "HSlXCcAqiTc",
+    "title": "MONTAGEM FINO ALUCINADOR 🥶🇰🇷 [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "9G09yvWc8L0",
+    "title": "MONTAGEM AUTOMOTIVO TRÁGICO 🇰🇷🥵 - [ DJ MENOR DA DZ7 ]"
+  },
+  {
+    "id": "ZKzzUqqnsyE",
+    "title": "MONTAGEM HINO CELESTIAL 🤬🥶 - [ DJ MENOR DA DZ7 & DJ ZWK ]"
+  }
+];
+
+let player;
+let currentSong = null;
+
+let correct = 0;
+let wrong = 0;
+
+function normalize(text){
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function updateScore(){
+    document.getElementById("score").innerHTML =
+        `Aciertos: ${correct} | Fallos: ${wrong}`;
+}
+
+function status(msg){
+    document.getElementById("status").textContent = msg;
+}
+
+function onYouTubeIframeAPIReady(){
+
+    player = new YT.Player("player",{
+        width:"1",
+        height:"1",
+        playerVars:{
+            autoplay:0
+        },
+        events:{
+            onReady:()=>{
+                status("Listo");
+            },
+            onError:(e)=>{
+                console.log("YT Error", e.data);
+                status("Error vídeo: " + e.data);
+            }
+        }
+    });
+}
+
+function playRandomClip(){
+
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("guess").value = "";
+
+    currentSong =
+        videos[Math.floor(Math.random() * videos.length)];
+
+    player.loadVideoById(currentSong.id);
+
+    const interval = setInterval(()=>{
+
+        const duration = player.getDuration();
+
+        if(duration > 10){
+
+            clearInterval(interval);
+
+            const start =
+                Math.floor(
+                    Math.random() * (duration - 3)
+                );
+
+            player.seekTo(start,true);
+            player.playVideo();
+
+            status("🎵 Escuchando...");
+
+            setTimeout(()=>{
+                player.pauseVideo();
+                status("⏹ Fragmento terminado");
+            },6000);
+        }
+
+    },500);
+}
+
+function checkAnswer(){
+
+    if(!currentSong) return;
+
+    const user =
+        normalize(
+            document.getElementById("guess").value
+        );
+
+    const answer =
+        normalize(currentSong.title);
+
+    const words =
+        answer.split(" ").filter(w => w.length >= 4);
+
+    let ok = false;
+
+    // Coincidencia exacta o parcial
+    if(answer.includes(user) || user.includes(answer)){
+        ok = true;
+    }
+
+    // Coincide con alguna palabra importante
+    if(!ok){
+        ok = words.some(word =>
+            user.includes(word)
+        );
+    }
+
+    if(ok){
+
+        correct++;
+
+        document.getElementById("result").innerHTML =
+            "✅ Correcto";
+
+    }else{
+
+        wrong++;
+
+        document.getElementById("result").innerHTML =
+            "❌ Incorrecto<br><br>" +
+            currentSong.title;
+    }
+
+    updateScore();
+}
+
+updateScore();
+
+</script>
+
+</body>
+</html>
