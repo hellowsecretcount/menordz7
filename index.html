@@ -2081,40 +2081,36 @@ function onYouTubeIframeAPIReady(){
 
 function playRandomClip(){
 
-    document.getElementById("result").innerHTML = "";
-    document.getElementById("guess").value = "";
+document.getElementById("result").innerHTML = "";
+document.getElementById("guess").value = "";
 
-    currentSong =
-        videos[Math.floor(Math.random() * videos.length)];
+currentSong =
+    videos[Math.floor(Math.random() * videos.length)];
 
-    player.loadVideoById(currentSong.id);
+const start = Math.floor(Math.random() * 120);
 
-    const interval = setInterval(()=>{
+document.getElementById("player").innerHTML = `
+    <iframe
+        id="customPlayer"
+        width="1"
+        height="1"
+        src="https://yout-ube.com/embed/${currentSong.id}?autoplay=1&start=${start}"
+        allow="autoplay">
+    </iframe>
+`;
 
-        const duration = player.getDuration();
+status("🎵 Escutando...");
 
-        if(duration > 10){
+setTimeout(() => {
 
-            clearInterval(interval);
+    document.getElementById("player").innerHTML = "";
 
-            const start =
-                Math.floor(
-                    Math.random() * (duration - 3)
-                );
+    status("⏹ Final");
 
-            player.seekTo(start,true);
-            player.playVideo();
+}, 6000);
 
-            status("🎵 Escutando...");
-
-            setTimeout(()=>{
-                player.pauseVideo();
-                status("⏹ Final");
-            },6000);
-        }
-
-    },500);
 }
+
 
 function checkAnswer(){
 
