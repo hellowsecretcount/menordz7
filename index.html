@@ -2078,37 +2078,48 @@ function onYouTubeIframeAPIReady(){
         }
     });
 }
+    
+let currentTimeout = null;
 
 function playRandomClip(){
 
-document.getElementById("result").innerHTML = "";
-document.getElementById("guess").value = "";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("guess").value = "";
 
-currentSong =
-    videos[Math.floor(Math.random() * videos.length)];
+    currentSong =
+        videos[Math.floor(Math.random() * videos.length)];
 
-const start = Math.floor(Math.random() * 120);
+    const start =
+        Math.floor(Math.random() * 90);
 
-document.getElementById("player").innerHTML = `
-    <iframe
-        id="customPlayer"
-        width="1"
-        height="1"
-        src="https://yout-ube.com/embed/${currentSong.id}?autoplay=1&start=${start}"
-        allow="autoplay">
-    </iframe>
-`;
+    status("⌛ Cargando...");
 
-status("🎵 Escutando...");
+    document.getElementById("player").innerHTML = `
+        <iframe
+            id="audioFrame"
+            width="1"
+            height="1"
+            style="border:0;opacity:0;"
+            allow="autoplay"
+            src="https://www.youtube-nocookie.com/embed/${currentSong.id}?playlist=${currentSong.id}&autoplay=1&iv_load_policy=3&loop=1&start=${start}">
+        </iframe>
+    `;
 
-setTimeout(() => {
+    const frame = document.getElementById("audioFrame");
 
-    document.getElementById("player").innerHTML = "";
+    frame.onload = () => {
 
-    status("⏹ Final");
+        status("🎵 Escutando...");
 
-}, 6000);
+        setTimeout(() => {
 
+            document.getElementById("player").innerHTML = "";
+
+            status("⏹ Final");
+
+        }, 6000);
+
+    };
 }
 
 
