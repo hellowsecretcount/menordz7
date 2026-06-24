@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Adivina la canción</title>
+<title>Adivinhe a música</title>
 
 <style>
 body{
@@ -47,16 +47,16 @@ input{
 </head>
 <body>
 
-<h1>🎵 Adivina la canción</h1>
+<h1>🎵 Adivinhe a música do Menor da Dz7</h1>
 
 <div id="score">
-Aciertos: 0 | Fallos: 0
+Acerto: 0 | Incorreto: 0
 </div>
 
 <br>
 
 <button onclick="playRandomClip()">
-Escuchar 6 segundos
+Escutar 6 segundos
 </button>
 
 <br>
@@ -64,7 +64,7 @@ Escuchar 6 segundos
 <input
     id="guess"
     type="text"
-    placeholder="Escribe el nombre de la canción">
+    placeholder="Escreva o nome da música">
 
 <br>
 
@@ -2052,7 +2052,7 @@ function normalize(text){
 
 function updateScore(){
     document.getElementById("score").innerHTML =
-        `Aciertos: ${correct} | Fallos: ${wrong}`;
+        `Acerto: ${correct} | Incorreto: ${wrong}`;
 }
 
 function status(msg){
@@ -2073,7 +2073,7 @@ function onYouTubeIframeAPIReady(){
             },
             onError:(e)=>{
                 console.log("YT Error", e.data);
-                status("Error vídeo: " + e.data);
+                status("Error: " + e.data);
             }
         }
     });
@@ -2105,11 +2105,11 @@ function playRandomClip(){
             player.seekTo(start,true);
             player.playVideo();
 
-            status("🎵 Escuchando...");
+            status("🎵 Escutando...");
 
             setTimeout(()=>{
                 player.pauseVideo();
-                status("⏹ Fragmento terminado");
+                status("⏹ Final");
             },6000);
         }
 
@@ -2150,14 +2150,14 @@ function checkAnswer(){
         correct++;
 
         document.getElementById("result").innerHTML =
-            "✅ Correcto";
+            "✅ Correto";
 
     }else{
 
         wrong++;
 
         document.getElementById("result").innerHTML =
-            "❌ Incorrecto<br><br>" +
+            "❌ Incorreto<br><br>" +
             currentSong.title;
     }
 
